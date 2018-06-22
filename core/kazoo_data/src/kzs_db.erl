@@ -222,9 +222,17 @@ add_update_remove_views(Server, Db, CurrentViews, NewViews, ShouldRemoveDangling
 add_views(Server, Db, Add, NewViews) ->
     Views = [props:get_value(Id, NewViews) || Id <- Add],
     {'ok', JObjs} = kzs_doc:save_docs(Server, Db, Views, []),
-    [kz_doc:id(JObj)
+    [Id
      || JObj <- JObjs,
-        <<"conflict">> =:= kz_json:get_value(<<"error">>, JObj)
+        Id <- [kz_doc:id(JObj)],
+        Error <- [kz_json:get_value(<<"error">>, JObj)],
+        'true' <- [(Error =/= 'undefined'
+                    andalso Error =/= <<"conflict">>  %% compilation_error, ....
+                        andalso lager:warning("adding view ~s resulted in an error: ~s", [Id, Error]) =:= 'ok'
+                   )
+                   orelse 'true'
+                  ],
+        <<"conflict">> =:= Error
     ].
 
 -spec update_views(map(), kz_term:ne_binary(), kz_term:ne_binaries(), views_listing(), views_listing()) -> {integer(), kz_term:api_ne_binaries()}.
@@ -237,9 +245,17 @@ update_views(Server, Db, Update, CurrentViews, NewViews) ->
                   should_update(Id, NewView, CurrentView)
               ]),
     {'ok', JObjs} = kzs_doc:save_docs(Server, Db, Views, []),
-    Errors = [kz_doc:id(JObj)
+    Errors = [Id
               || JObj <- JObjs,
-                 <<"conflict">> =:= kz_json:get_value(<<"error">>, JObj)
+                 Id <- [kz_doc:id(JObj)],
+                 Error <- [kz_json:get_value(<<"error">>, JObj)],
+                 'true' <- [(Error =/= 'undefined'
+                             andalso Error =/= <<"conflict">> %% compilation_error, ....
+                                 andalso lager:warning("updating view ~s resulted in an error: ~s", [Id, Error]) =:= 'ok'
+                            )
+                            orelse 'true'
+                           ],
+                 <<"conflict">> =:= Error
              ],
     {length(Views), Errors}.
 
