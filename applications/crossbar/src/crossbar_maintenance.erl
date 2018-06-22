@@ -45,7 +45,6 @@
 
 -export([does_schema_exist/1]).
 
--export([does_schema_exist/1]).
 -export([check_system_configs/0]).
 -export([update_schemas/0]).
 

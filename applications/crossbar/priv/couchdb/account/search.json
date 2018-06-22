@@ -34,7 +34,7 @@
             "map": [
                 "function(doc) {",
                 "  if (doc.pvt_deleted || !doc.pvt_type) return;",
-                "  var var actual_name = '', name = '', first_name = '', last_name = '';",
+                "  var actual_name = '', name = '', first_name = '', last_name = '';",
                 "  var name_obj = {};",
                 "  if (doc.hasOwnProperty('first_name') || doc.hasOwnProperty('last_name')) {",
                 "    fist_name = (doc.first_name || '').toLowerCase().replace(/[^a-z0-9]/g, '');",
