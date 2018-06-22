@@ -322,16 +322,12 @@ merge_plan(#kz_service_plans{plans=PlanJObjs}=ServicesPlan, MergeToSingle) ->
     Dict = lists:foldl(fun(PlanJObj, D) ->
                                Strategy = kzd_service_plan:merge_strategy(PlanJObj),
                                Priority = kzd_service_plan:merge_priority(PlanJObj),
-                               lager:debug("HESAAM Strategy ~p", [Strategy]),
-                               lager:debug("HESAAM PlanJObj ~p", [PlanJObj]),
                                dict:append(Strategy, {Priority, PlanJObj}, D)
                        end, dict:new(), PlanJObjs),
     Sorted = lists:sort(fun merge_plan_strategy_sort/2
                        ,dict:to_list(Dict)
                        ),
-    lager:debug("HESAAM ~p", [length(Sorted)]),
     Merged = merge_plan_plans(Sorted, []),
-    lager:debug("HESAAM MergeToSingle ~p", [MergeToSingle]),
     case MergeToSingle of
         'false' ->
             ServicesPlan#kz_service_plans{plans=Merged};
